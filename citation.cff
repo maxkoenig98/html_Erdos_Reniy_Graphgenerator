@@ -2,12 +2,12 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "Erdős–Rényi Random Graph Generator"
 authors:
-  - family-names: "Mustermann"
+  - family-names: "König"
     given-names: "Max"
 version: "1.0.0"
 date-released: "2024-10-15"
-url: "https://github.com/your-repo-link"
-repository-code: "https://github.com/your-repo-link"
+url: "https://github.com/maxkoenig98/html_Erdos_Reniy_Graphgenerator"
+repository-code: "https://github.com/maxkoenig98/html_Erdos_Reniy_Graphgenerator"
 keywords:
   - "Erdős–Rényi"
   - "random graph"
