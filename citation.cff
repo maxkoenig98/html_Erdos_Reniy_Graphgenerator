@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Erdős–Rényi Random Graph Generator"
+authors:
+  - family-names: "Mustermann"
+    given-names: "Max"
+version: "1.0.0"
+date-released: "2024-10-15"
+url: "https://github.com/your-repo-link"
+repository-code: "https://github.com/your-repo-link"
+keywords:
+  - "Erdős–Rényi"
+  - "random graph"
+  - "graph theory"
+  - "graph generator"
+license: "MIT"
+abstract: "This tool provides an interactive way to generate and visualize random graphs using the Erdős–Rényi model. It allows users to adjust node count, edge probability, and highlights triangles within the graph."
