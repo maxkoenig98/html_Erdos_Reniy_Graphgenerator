@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erdős–Rényi Random Graph Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #2a9d8f;
+        }
+        label {
+            font-size: 1.1em;
+        }
+        input[type="number"] {
+            padding: 5px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100px;
+        }
+        button {
+            background-color: #2a9d8f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #21867a;
+        }
+        #controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        #graphCanvas {
+            border: 2px solid #2a9d8f;
+            border-radius: 10px;
+            background-color: #ffffff;
+        }
+    </style>
+    <script>
+        let nodes = 10;
+        let probability = 0.2;
+        let drawTrianglesInRed = true;
+        let positions = [];
+        let edges = [];
+        let adjacencyList = [];
+
+        // Function to generate the graph
+        function generateGraph() {
+            const canvas = document.getElementById("graphCanvas");
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            positions = [];
+            adjacencyList = Array.from({ length: nodes }, () => []);
+            const radius = 250;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            // Position nodes in a circle
+            for (let i = 0; i < nodes; i++) {
+                const angle = (2 * Math.PI / nodes) * i;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                positions.push({ x, y });
+
+                // Draw nodes
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            // Add edges with probability p
+            edges = []; // Store edges for later use
+            for (let i = 0; i < nodes; i++) {
+                for (let j = i + 1; j < nodes; j++) {
+                    if (Math.random() < probability) {
+                        adjacencyList[i].push(j);
+                        adjacencyList[j].push(i);
+                        edges.push([i, j]); // Store edge
+                    }
+                }
+            }
+
+            // Draw initial graph edges in blue
+            drawGraphEdges(ctx);
+            // Count triangles and draw edges
+            const triangleCount = countTriangles(adjacencyList, ctx);
+            document.getElementById("triangleCount").innerText = `Number of triangles: ${triangleCount}`;
+        }
+
+        // Function to draw edges
+        function drawGraphEdges(ctx) {
+            ctx.strokeStyle = "rgba(0, 0, 255, 1)";
+            for (let [i, j] of edges) {
+                drawEdge(ctx, positions[i], positions[j], 'rgba(0, 0, 255, 1)');
+            }
+        }
+
+        // Function to count triangles
+        function countTriangles(adjacencyList, ctx) {
+            let count = 0;
+
+            // Check all combinations of 3 nodes
+            for (let i = 0; i < adjacencyList.length; i++) {
+                for (let j of adjacencyList[i]) {
+                    if (j > i) { // Avoid double counting
+                        for (let k of adjacencyList[j]) {
+                            if (k > j && adjacencyList[i].includes(k)) {
+                                // Triangle found, draw edges
+                                const color = drawTrianglesInRed ? 'red' : 'rgba(0, 0, 255, 1)';
+                                drawEdge(ctx, positions[i], positions[j], color);
+                                drawEdge(ctx, positions[j], positions[k], color);
+                                drawEdge(ctx, positions[k], positions[i], color);
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return count;
+        }
+
+        // Function to draw an edge
+        function drawEdge(ctx, pos1, pos2, color) {
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(pos1.x, pos1.y);
+            ctx.lineTo(pos2.x, pos2.y);
+            ctx.stroke();
+        }
+
+        // Functions to update parameters
+        function updateNodes(value) {
+            nodes = value;
+            generateGraph();
+        }
+
+        function updateProbability(value) {
+            probability = value;
+            generateGraph();
+        }
+
+        function toggleTriangleColor() {
+            drawTrianglesInRed = document.getElementById("drawTrianglesInRed").checked;
+            drawGraphEdges(document.getElementById("graphCanvas").getContext("2d"));
+            countTriangles(adjacencyList, document.getElementById("graphCanvas").getContext("2d"));
+        }
+
+        // Initial graph generation
+        window.onload = generateGraph;
+    </script>
+</head>
+<body>
+    <h1>Erdős–Rényi Random Graph Generator</h1>
+    <label for="nodes">Number of nodes (n): </label>
+    <input type="number" id="nodes" value="10" min="1" oninput="updateNodes(this.value)"><br>
+    
+    <label for="probability">Edge probability (p): </label>
+    <input type="number" id="probability" value="0.2" min="0" max="1" step="0.01" oninput="updateProbability(this.value)"><br>
+
+    <input type="checkbox" id="drawTrianglesInRed" checked onclick="toggleTriangleColor()">
+    <label for="drawTrianglesInRed">Draw triangles in red</label><br>
+    
+    <button onclick="generateGraph()">Generate Graph</button>
+    
+    <h2>Graph:</h2>
+    <canvas id="graphCanvas" width="600" height="600"></canvas>
+    <h2 id="triangleCount">Number of triangles: 0</h2>
+</body>
+</html>
